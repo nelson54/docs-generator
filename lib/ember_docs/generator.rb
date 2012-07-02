@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'rbconfig'
 
 require 'ember_docs/server'
 
@@ -22,8 +23,9 @@ module EmberDocs
 
     def command
       @command ||= begin
+        node_path = if RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/ then "node " else "" end
         run_js_path = File.expand_path("../../../vendor/jsdoc/app/run.js", __FILE__)
-        command = "#{run_js_path} -a -v -r=20 -t=\"#{template}\" #{input_dirs.map{|d| %{"#{d}"} }.join(' ')} " <<
+        command = "#{node_path}#{run_js_path} -a -v -r=20 -t=\"#{template}\" #{input_dirs.map{|d| %{"#{d}"} }.join(' ')} " <<
                       "-d=\"#{output_dir}\" -f=class.js -l=Docs.Class"
         command << exclude.map{|e| %{ -E="#{e}"} }.join if exclude
         command << " --smartdown" if smartdown
